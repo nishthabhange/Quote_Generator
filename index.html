@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .quote-display {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #quote-text {
+            font-size: 1.8em;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        #quote-author {
+            font-size: 1.2em;
+            color: #667eea;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        #quote-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .quote-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .quote-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #c62828;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀Quote Generator</h1>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('view')">View Quotes</div>
+            <div class="tab" onclick="switchTab('add')">Add Quote</div>
+            <div class="tab" onclick="switchTab('search')">Search</div>
+            <div class="tab" onclick="switchTab('stats')">Statistics</div>
+        </div>
+
+        <!-- View Quotes Tab -->
+        <div id="view-tab" class="tab-content active">
+            <div class="card quote-display">
+                <div id="quote-text">Click a button to load a quote from the server...</div>
+                <div id="quote-author"></div>
+                <span id="quote-category"></span>
+            </div>
+
+            <div class="card">
+                <div class="button-grid">
+                    <button class="btn-primary" onclick="getRandomQuote()">Random Quote</button>
+                    <button class="btn-info" onclick="getAllQuotes()">All Quotes</button>
+                    <button class="btn-warning" onclick="getQuoteByCategory()">By Category</button>
+                </div>
+            </div>
+
+            <div class="card" id="all-quotes-section" style="display: none;">
+                <h2 style="margin-bottom: 15px; color: #667eea;">All Quotes</h2>
+                <div class="quote-list" id="all-quotes-list"></div>
+            </div>
+        </div>
+
+        <!-- Add Quote Tab -->
+        <div id="add-tab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Add New Quote</h2>
+                <div id="add-message"></div>
+                <form onsubmit="addQuote(event)">
+                    <div class="form-group">
+                        <label for="new-quote-text">Quote Text *</label>
+                        <input type="text" id="new-quote-text" required placeholder="Enter quote text...">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-quote-author">Author *</label>
+                        <input type="text" id="new-quote-author" required placeholder="Enter author name...">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-quote-category">Category</label>
+                        <select id="new-quote-category">
+                            <option value="Motivation">Motivation</option>
+                            <option value="Leadership">Leadership</option>
+                            <option value="Life">Life</option>
+                            <option value="Inspiration">Inspiration</option>
+                            <option value="Wisdom">Wisdom</option>
+                            <option value="Success">Success</option>
+                            <option value="Learning">Learning</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Programming">Programming</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-success" style="width: 100%;">Add Quote to XML</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search-tab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Search Quotes</h2>
+                <div class="form-group">
+                    <input type="text" id="search-input" placeholder="Search by text or author...">
+                </div>
+                <button class="btn-primary" onclick="searchQuotes()" style="width: 100%;">Search</button>
+                <div id="search-results" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="stats-tab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 20px; color: #667eea;">Quote Statistics</h2>
+                <div id="stats-loading" class="loading">Click "Load Statistics" to view data</div>
+                <div id="stats-content" style="display: none;">
+                    <div class="stats-grid" id="stats-grid"></div>
+                    <div style="margin-top: 30px;">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">Top Authors</h3>
+                        <div id="top-authors"></div>
+                    </div>
+                </div>
+                <button class="btn-info" onclick="loadStats()" style="width: 100%; margin-top: 20px;">Load Statistics</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CO1, CO2, CO3, CO5: Full-Stack JavaScript Integration
+        const API_URL = 'http://localhost:3000/api';
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Display quote
+        function displayQuote(quote) {
+            document.getElementById('quote-text').textContent = `"${quote.text}"`;
+            document.getElementById('quote-author').textContent = `— ${quote.author}`;
+            
+            const categorySpan = document.getElementById('quote-category');
+            if (quote.category) {
+                categorySpan.textContent = quote.category;
+                categorySpan.style.display = 'inline-block';
+            } else {
+                categorySpan.style.display = 'none';
+            }
+        }
+
+        // Get random quote from server
+        async function getRandomQuote() {
+            try {
+                const response = await fetch(`${API_URL}/quotes/random`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayQuote(data.quote);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch quote. Make sure the server is running on port 3000.');
+            }
+        }
+
+        // Get all quotes
+        async function getAllQuotes() {
+            try {
+                const response = await fetch(`${API_URL}/quotes`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const section = document.getElementById('all-quotes-section');
+                    const list = document.getElementById('all-quotes-list');
+                    
+                    list.innerHTML = '';
+                    data.quotes.forEach(quote => {
+                        const item = document.createElement('div');
+                        item.className = 'quote-item';
+                        item.innerHTML = `
+                            <div style="font-style: italic; margin-bottom: 5px;">"${quote.text[0]}"</div>
+                            <div style="color: #667eea; font-weight: 600;">— ${quote.author[0]}</div>
+                            <div style="font-size: 0.9em; color: #999; margin-top: 5px;">
+                                Category: ${quote.category ? quote.category[0] : 'General'}
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                    
+                    section.style.display = 'block';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch quotes. Make sure the server is running.');
+            }
+        }
+
+        // Get quote by category
+        async function getQuoteByCategory() {
+            const category = prompt('Enter category (Motivation, Leadership, Life, Inspiration, Wisdom, Success, etc.):');
+            if (!category) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/quotes/category/${category}`);
+                const data = await response.json();
+                
+                if (data.success && data.quotes.length > 0) {
+                    const randomQuote = data.quotes[Math.floor(Math.random() * data.quotes.length)];
+                    displayQuote({
+                        text: randomQuote.text[0],
+                        author: randomQuote.author[0],
+                        category: randomQuote.category ? randomQuote.category[0] : category
+                    });
+                } else {
+                    alert(`No quotes found in category: ${category}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch quotes by category.');
+            }
+        }
+
+
+        // Add new quote
+        async function addQuote(event) {
+            event.preventDefault();
+            
+            const text = document.getElementById('new-quote-text').value;
+            const author = document.getElementById('new-quote-author').value;
+            const category = document.getElementById('new-quote-category').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/quotes`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text, author, category })
+                });
+                
+                const data = await response.json();
+                const messageDiv = document.getElementById('add-message');
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success">✓ Quote added successfully to XML!</div>';
+                    document.getElementById('new-quote-text').value = '';
+                    document.getElementById('new-quote-author').value = '';
+                    setTimeout(() => messageDiv.innerHTML = '', 3000);
+                } else {
+                    messageDiv.innerHTML = `<div class="error">✗ Error: ${data.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('add-message').innerHTML = '<div class="error">✗ Failed to add quote. Make sure server is running.</div>';
+            }
+        }
+
+        // Search quotes
+        async function searchQuotes() {
+            const searchTerm = document.getElementById('search-input').value;
+            if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/quotes/search?q=${encodeURIComponent(searchTerm)}`);
+                const data = await response.json();
+                
+                const resultsDiv = document.getElementById('search-results');
+                
+                if (data.success && data.results.length > 0) {
+                    resultsDiv.innerHTML = `<h3 style="color: #667eea; margin-bottom: 15px;">Found ${data.results.length} result(s)</h3>`;
+                    
+                    data.results.forEach(quote => {
+                        const item = document.createElement('div');
+                        item.className = 'quote-item';
+                        item.innerHTML = `
+                            <div style="font-style: italic; margin-bottom: 5px;">"${quote.text[0]}"</div>
+                            <div style="color: #667eea; font-weight: 600;">— ${quote.author[0]}</div>
+                            <div style="font-size: 0.9em; color: #999; margin-top: 5px;">
+                                Category: ${quote.category ? quote.category[0] : 'General'}
+                            </div>
+                        `;
+                        resultsDiv.appendChild(item);
+                    });
+                } else {
+                    resultsDiv.innerHTML = '<div class="error">No quotes found matching your search.</div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('search-results').innerHTML = '<div class="error">Failed to search quotes.</div>';
+            }
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                document.getElementById('stats-loading').style.display = 'block';
+                document.getElementById('stats-content').style.display = 'none';
+                
+                const response = await fetch(`${API_URL}/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const statsGrid = document.getElementById('stats-grid');
+                    statsGrid.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${data.totalQuotes}</div>
+                            <div class="stat-label">Total Quotes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.categoriesCount}</div>
+                            <div class="stat-label">Categories</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${data.topAuthors.length}</div>
+                            <div class="stat-label">Authors</div>
+                        </div>
+                    `;
+                    
+                    const topAuthorsDiv = document.getElementById('top-authors');
+                    topAuthorsDiv.innerHTML = '';
+                    
+                    data.topAuthors.forEach(([author, count], index) => {
+                        const item = document.createElement('div');
+                        item.className = 'quote-item';
+                        item.innerHTML = `
+                            <strong>${index + 1}. ${author}</strong>
+                            <span style="float: right; color: #667eea;">${count} quote(s)</span>
+                        `;
+                        topAuthorsDiv.appendChild(item);
+                    });
+                    
+                    document.getElementById('stats-loading').style.display = 'none';
+                    document.getElementById('stats-content').style.display = 'block';
+                } else {
+                    alert('Error loading statistics');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to load statistics. Make sure server is running.');
+            }
+        }
+
+        // Load initial quote on page load
+        window.addEventListener('load', () => {
+            console.log('Quote Generator loaded. Make sure Node.js server is running on port 3000');
+        });
+    </script>
+</body>
+</html>
