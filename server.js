@@ -1,5 +1,4 @@
-// CO3 & CO5: Server-Side Programming with Node.js
-// This is your main server file: server.js
+//main server file: server.js
 
 const express = require('express');
 const fs = require('fs');
@@ -23,7 +22,7 @@ const builder = new xml2js.Builder();
 // Path to XML file
 const quotesXMLPath = path.join(__dirname, 'quotes.xml');
 
-// CO4: Function to read quotes from XML
+// Function to read quotes from XML
 function readQuotesFromXML() {
     return new Promise((resolve, reject) => {
         fs.readFile(quotesXMLPath, 'utf-8', (err, data) => {
@@ -42,7 +41,7 @@ function readQuotesFromXML() {
     });
 }
 
-// CO4: Function to write quotes to XML
+//Function to write quotes to XML
 function writeQuotesToXML(data) {
     return new Promise((resolve, reject) => {
         const xml = builder.buildObject(data);
@@ -56,7 +55,7 @@ function writeQuotesToXML(data) {
     });
 }
 
-// CO3: Route to get all quotes from XML
+//Route to get all quotes from XML
 app.get('/api/quotes', async (req, res) => {
     try {
         const quotesData = await readQuotesFromXML();
@@ -74,7 +73,7 @@ app.get('/api/quotes', async (req, res) => {
     }
 });
 
-// CO3: Route to get a random quote from XML
+// Route to get a random quote from XML
 app.get('/api/quotes/random', async (req, res) => {
     try {
         const quotesData = await readQuotesFromXML();
@@ -151,7 +150,7 @@ app.post('/api/quotes', async (req, res) => {
     }
 });
 
-// CO3: Route to get quotes by category
+// Route to get quotes by category
 app.get('/api/quotes/category/:category', async (req, res) => {
     try {
         const category = req.params.category;
@@ -177,7 +176,7 @@ app.get('/api/quotes/category/:category', async (req, res) => {
     }
 });
 
-// CO3: Route to search quotes
+//Route to search quotes
 app.get('/api/quotes/search', async (req, res) => {
     try {
         const searchTerm = req.query.q;
@@ -212,7 +211,7 @@ app.get('/api/quotes/search', async (req, res) => {
     }
 });
 
-// CO3: Route to get quote statistics
+//Route to get quote statistics
 app.get('/api/stats', async (req, res) => {
     try {
         const quotesData = await readQuotesFromXML();
